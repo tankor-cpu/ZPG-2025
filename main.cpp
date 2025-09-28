@@ -16,9 +16,13 @@
 
 
 float points[] = {
-	 0.0f, 0.5f, 0.0f,
+	 0.5f, 0.5f, 0.0f,
 	 0.5f, -0.5f, 0.0f,
-	-0.5f, -0.5f, 0.0f
+	-0.5f, -0.5f, 0.0f,
+
+	-0.5f, 0.5f, 0.0f,
+	-0.5f, -0.5f, 0.0f,
+	0.5f, 0.5f, 0.0f
 };
 
 const char* vertex_shader =
@@ -34,7 +38,7 @@ const char* fragment_shader =
 "#version 330\n"
 "out vec4 fragColor;"
 "void main () {"
-"     fragColor = vec4 (0.5, 0.0, 0.5, 1.0);"
+"     fragColor = vec4 (0.1, 0.5, 0.5, 1.0);"
 "}";
 
 
@@ -114,9 +118,23 @@ int main(void)
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertex_shader, NULL);
 	glCompileShader(vertexShader);
+	GLint success;
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		char log[512];
+		glGetShaderInfoLog(vertexShader, 512, NULL, log);
+		fprintf(stderr, "Vertex shader error:\n%s\n", log);
+	}
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragment_shader, NULL);
 	glCompileShader(fragmentShader);
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		char log[512];
+		glGetShaderInfoLog(fragmentShader, 512, NULL, log);
+		fprintf(stderr, "Fragment shader error:\n%s\n", log);
+	}
+
 	GLuint shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, fragmentShader);
 	glAttachShader(shaderProgram, vertexShader);
@@ -133,7 +151,6 @@ int main(void)
 		delete[] strInfoLog;
 	}
 
-	// === и только после проверки ===
 	glUseProgram(shaderProgram);
 
 	//vertex buffer object (VBO)
@@ -191,7 +208,7 @@ int main(void)
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
 		// draw triangles
-		glDrawArrays(GL_TRIANGLES, 0, 3); //mode,first,count
+		glDrawArrays(GL_TRIANGLES, 0, 6); //mode,first,count
 		// update other events like input handling
 		glfwPollEvents();
 		// put the stuff we’ve been drawing onto the display
