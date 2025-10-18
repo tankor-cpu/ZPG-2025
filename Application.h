@@ -6,6 +6,7 @@
 #include "ShaderProgram.h"
 #include "Model.h"
 #include "Scene.h"
+#include "Camera.h"
 
 #include <string>
 #include <cstdio>
@@ -35,6 +36,9 @@ private:
 	Model model;
 	Model model2;
 	Model sphereModel;
+	Model treeModel;
+	Model bushesModel;
+
 
 	static void error_callback(int error, const char* description);
 	bool initGLFW_();
@@ -51,5 +55,8 @@ private:
 
 	Rotation* rotation1 = nullptr;
 	Rotation* rotation2 = nullptr;
+
+	Camera camera;
+	float lastTime = 0.0f;
 
 };

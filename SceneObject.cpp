@@ -7,9 +7,11 @@ SceneObject::SceneObject(Model* model, ShaderProgram* shaderProgram, Transformat
 
 void SceneObject::draw(const glm::mat4& P, const glm::mat4& V)
 {
-	glm::mat4 PVM = P * V * transformation->getMatrix();
+	glm::mat4 M = transformation->getMatrix();
 	shaderProgram->use();
-	shaderProgram->setUniform("PVM", PVM);
+	shaderProgram->setUniform("P", P);
+	shaderProgram->setUniform("V", V);
+	shaderProgram->setUniform("M", M);
 
 	model->draw();
 }

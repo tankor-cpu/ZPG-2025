@@ -8,13 +8,25 @@
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtc/type_ptr.hpp> // glm::value_ptr
 #include <string>
+#include "Observer.h"
 
-class ShaderProgram {
+class Shader;
+class Camera;
+
+class ShaderProgram : public Observer{
 public:
 	ShaderProgram();
 	~ShaderProgram();
 
+	void update() override;
+	void setCamera(Camera* cam) { camera = cam; }
+
+
 	void use() const;
+	bool create_();
+	bool setShader(const Shader& shader);
+	bool link();
+
 	bool compileFromSource(const char* vertexSrc, const char* fragmentSrc);
 	bool compileFromFile(const char* vertexPath, const char* fragmentPath);
 
@@ -24,8 +36,10 @@ public:
 	void setUniform(const std::string& name, int value);
 	void setUniform(const std::string& name, bool value);
 
+
 private:
 	GLuint id;
 	bool compileShader(GLuint shader,const char* src, const char* tag);
 	bool linkProgram(GLuint vs, GLuint fs);
+	Camera* camera = nullptr;
 };

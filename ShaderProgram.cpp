@@ -4,7 +4,8 @@
 #include <sstream>
 #include <iostream>
 #include <string>
-
+#include "Shader.h"
+#include "Camera.h"
 
 
 ShaderProgram::ShaderProgram(){}
@@ -14,9 +15,51 @@ ShaderProgram::~ShaderProgram()
 	if (id != 0) glDeleteProgram(id);
 }
 
+void ShaderProgram::update()
+{
+	if (!camera) return;
+
+	use();
+	setUniform("V", camera->getViewMatrix());
+	//setUniform("cameraPos", camera->getPosition());
+	std::cout << "ShaderProgram got a message from Camera" << std::endl;
+}
+
 void ShaderProgram::use() const
 {
 	glUseProgram(id);
+}
+
+bool ShaderProgram::create_()
+{
+	id = glCreateProgram();
+	if (!id) {
+		std::cerr << "glCreateProgram() failed — GLEW not initialize or not context!\n";
+		return false;
+	}
+	return true;
+}
+
+bool ShaderProgram::setShader(const Shader& shader)
+{
+	if (!id || !shader.id) return false;
+	glAttachShader(id, shader.id);
+	return true;
+}
+
+bool ShaderProgram::link()
+{
+	glLinkProgram(id);
+	GLint ok = GL_FALSE;
+	glGetProgramiv(id, GL_LINK_STATUS, &ok);
+	if (!ok) {
+		char log[1024];
+		glGetProgramInfoLog(id, 1024, nullptr, log);
+		std::cerr << "Program link error:\n" << log << std::endl;
+		return false;
+	}
+	std::cout << "Linked shader program\n";
+	return true;
 }
 
 bool ShaderProgram::compileShader(GLuint shader, const char* src, const char* tag)
@@ -54,7 +97,6 @@ bool ShaderProgram::linkProgram(GLuint vs, GLuint fs)
 	glDetachShader(id, vs);
 	return true;
 }
-
 
 
 bool ShaderProgram::compileFromSource(const char* vertexSrc, const char* fragmentSrc)
